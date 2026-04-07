@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erasmus+ Mobility</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0a1628; --blue: #1a4fd6; --gold: #f0b429;
+  --surface: #f0f4ff; --white: #ffffff; --text: #1a1f36;
+  --muted: #6b7898; --border: #d8e0f5; --error: #dc2626;
+  --success: #059669; --radius: 14px;
+  --shadow: 0 4px 24px rgba(10,22,40,0.10);
+  --shadow-lg: 0 8px 48px rgba(10,22,40,0.16);
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 80% 50% at 10% 0%, rgba(26,79,214,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 40% at 90% 100%, rgba(240,180,41,0.07) 0%, transparent 60%);
+}
+.page-wrap { position: relative; z-index: 1; max-width: 740px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+/* HERO */
+.hero { background: var(--navy); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -40px; right: -60px; width: 260px; height: 260px; border-radius: 50%; background: rgba(26,79,214,0.2); }
+.hero::after  { content: ''; position: absolute; bottom: -60px; left: 40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(240,180,41,0.10); }
+.hero-top { display: flex; align-items: flex-start; gap: 1.25rem; position: relative; z-index: 1; }
+.eu-flag { flex-shrink: 0; width: 72px; height: 48px; border-radius: 4px; }
+.hero-titles { flex: 1; }
+.hero-erasmus { font-family: 'DM Sans', sans-serif; font-size: clamp(1.5rem,4vw,2rem); font-weight: 400; color: var(--white); line-height: 1.1; }
+.hero-erasmus strong { font-weight: 700; }
+.hero-project { margin-top: 0.6rem; display: none; }
+.hero-project.visible { display: block; }
+.hero-project-name { color: var(--gold); font-weight: 500; font-size: 0.95rem; margin-bottom: 2px; }
+.hero-project-meta { color: rgba(255,255,255,0.55); font-size: 0.82rem; }
+.hero-spolufinancovano { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.12); position: relative; z-index: 1; font-size: 0.72rem; color: rgba(255,255,255,0.45); letter-spacing: 0.3px; }
+
+/* PROGRESS */
+.progress-wrap { background: var(--white); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); border: 1px solid var(--border); display: none; }
+.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.progress-label { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.progress-count { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--blue); }
+.steps-row { display: flex; gap: 6px; }
+.step-dot { flex: 1; height: 5px; border-radius: 999px; background: var(--border); transition: background 0.4s; }
+.step-dot.active { background: var(--blue); }
+.step-dot.done { background: var(--gold); cursor: pointer; }
+.step-names { display: flex; gap: 6px; margin-top: 0.6rem; }
+.step-name { flex: 1; font-size: 0.68rem; text-align: center; color: var(--border); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.step-name.active { color: var(--blue); }
+.step-name.done { color: var(--gold); cursor: pointer; }
+
+/* FORM CARD */
+.form-card { background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); border: 1px solid var(--border); display: none; animation: fadeUp 0.35s ease; }
+.form-card.active { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+
+.card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.75rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.card-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.card-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--gold); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.card-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--navy); }
+.card-subtitle { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+/* FIELDS */
+.field-group { margin-bottom: 1.25rem; }
+.field-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+.field-grid.col2 { grid-template-columns: 1fr 1fr; }
+.field-grid.col3 { grid-template-columns: 1fr 1fr 1fr; }
+@media(max-width: 560px) { .field-grid.col2, .field-grid.col3 { grid-template-columns: 1fr; } }
+label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-bottom: 0.4rem; }
+label .req { color: var(--blue); margin-left: 2px; }
+.badge-optional { display: inline-block; font-size: 0.68rem; background: #e8edf8; color: var(--muted); border-radius: 6px; padding: 1px 7px; margin-left: 6px; font-weight: 500; vertical-align: middle; }
+input[type=text], input[type=email], input[type=tel], input[type=date], textarea {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 0.65rem 0.9rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; appearance: none; outline: none;
+}
+input:focus, textarea:focus { border-color: var(--blue); background: var(--white); box-shadow: 0 0 0 3px rgba(26,79,214,0.1); }
+input:hover, textarea:hover { border-color: #b0bcd8; }
+input.invalid, textarea.invalid { border-color: var(--error); background: #fff5f5; }
+textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+.hint { font-size: 0.76rem; color: var(--muted); margin-top: 0.3rem; line-height: 1.5; }
+.divider { display: flex; align-items: center; gap: 0.75rem; margin: 1.5rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* INFO BOX */
+.info-box { border: 1.5px solid #fcd34d; border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.82rem; color: #78450a; line-height: 1.6; margin-bottom: 1.25rem; display: flex; gap: 0.6rem; background: #fffbea; }
+.info-box-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* RADIO */
+.radio-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.radio-option { display: flex; align-items: center; gap: 0.5rem; background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 0.55rem 1rem; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-weight: 500; }
+.radio-option:has(input:checked) { background: #eef2ff; border-color: var(--blue); color: var(--blue); }
+.radio-option input[type=radio] { width: 16px; height: 16px; margin: 0; accent-color: var(--blue); flex-shrink: 0; padding: 0; border: none; background: none; box-shadow: none; }
+
+/* BUTTONS */
+.nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; gap: 1rem; }
+.btn { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.5px; border: none; border-radius: 10px; padding: 0.75rem 1.5rem; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+.btn-ghost:hover { border-color: #b0bcd8; color: var(--text); }
+.btn-primary { background: var(--blue); color: var(--white); flex: 1; max-width: 240px; }
+.btn-primary:hover { background: #1340b8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,79,214,0.3); }
+.btn-primary:disabled { opacity: 0.6; pointer-events: none; }
+.btn-submit { background: var(--navy); color: var(--white); flex: 1; max-width: 320px; }
+.btn-submit:hover { background: #0f2040; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(10,22,40,0.3); }
+.btn-submit:disabled { opacity: 0.6; pointer-events: none; }
+
+/* ERROR + TOAST */
+.error-msg { background: #fff5f5; border: 1.5px solid var(--error); border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--error); margin-top: 0.75rem; display: none; }
+.error-msg.visible { display: block; }
+.toast { position: fixed; bottom: 2rem; right: 1rem; left: 1rem; max-width: 480px; margin: 0 auto; background: var(--white); border-radius: var(--radius); padding: 1.25rem 1.5rem; box-shadow: var(--shadow-lg); border-left: 5px solid var(--success); display: none; z-index: 999; font-size: 0.9rem; font-weight: 500; animation: slideUp 0.3s ease; }
+@media(min-width: 600px) { .toast { left: auto; width: 400px; right: 2rem; } }
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+/* KROK 0 */
+.code-center { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1rem 0 0.5rem; }
+.code-center .card-icon { margin-bottom: 1rem; }
+.code-center .card-title { font-size: 1.35rem; margin-bottom: 0.4rem; }
+.code-center .card-subtitle { margin-bottom: 1.75rem; }
+.code-input-wrap { width: 100%; max-width: 320px; }
+.code-input-wrap input { text-align: center; font-size: 1.1rem; letter-spacing: 2px; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="eu-flag" viewBox="0 0 72 48" xmlns="http://www.w3.org/2000/svg">
+        <rect width="72" height="48" fill="#003399"/>
+        <g fill="#FFCC00" transform="translate(36,24)">
+          <polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/>
+          <g transform="rotate(30)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(60)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(90)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(120)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(150)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(180)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(210)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(240)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(270)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(300)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+          <g transform="rotate(330)"><polygon points="0,-14 1.6,-9.5 6.5,-9.5 2.7,-6.8 4.1,-2.3 0,-5 -4.1,-2.3 -2.7,-6.8 -6.5,-9.5 -1.6,-9.5"/></g>
+        </g>
+      </svg>
+      <div class="hero-titles">
+        <div class="hero-erasmus">Erasmus<strong>+</strong></div>
+        <div class="hero-project" id="heroProject">
+          <div class="hero-project-name" id="heroNazev"></div>
+          <div class="hero-project-meta" id="heroMeta"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-spolufinancovano">Spolufinancováno Evropskou unií</div>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-header">
+      <span class="progress-label">Průběh vyplňování</span>
+      <span class="progress-count" id="progCount">Krok 1 / 5</span>
+    </div>
+    <div class="steps-row" id="stepsRow"></div>
+    <div class="step-names" id="stepNames"></div>
+  </div>
+
+  <form id="mainForm" novalidate>
+
+    <!-- KROK 0: KÓD -->
+    <div class="form-card active" data-step="0">
+      <div class="code-center">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="card-title">Přístupový kód</div>
+        <div class="card-subtitle">Zadejte kód, který jste obdrželi od správce projektu</div>
+      </div>
+      <div style="display:flex; justify-content:center;">
+        <div class="code-input-wrap">
+          <input type="text" id="kodInput" placeholder="Zadejte kód…" autocomplete="off">
+          <div class="error-msg" id="kodError"></div>
+        </div>
+      </div>
+      <div class="nav-row" style="justify-content:center;">
+        <button type="button" class="btn btn-primary" id="kodBtn" onclick="overitKod()" style="max-width:220px;">
+          Ověřit a pokračovat →
+        </button>
+      </div>
+    </div>
+
+    <!-- KROK 1: OSOBNÍ ÚDAJE -->
+    <div class="form-card" data-step="1">
+      <div class="card-header">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="card-title">Osobní údaje</div><div class="card-subtitle">Základní identifikační informace</div></div>
+      </div>
+      <div class="field-grid col3">
+        <div class="field-group"><label>Titul před jménem <span class="badge-optional">opt.</span></label><input type="text" name="titul_pred" placeholder="Mgr., Ing.…"></div>
+        <div class="field-group"><label>Jméno <span class="req">*</span></label><input type="text" name="jmeno" required placeholder="Jana"></div>
+        <div class="field-group"><label>Příjmení <span class="req">*</span></label><input type="text" name="prijmeni" required placeholder="Nováková"></div>
+      </div>
+      <div class="field-grid col2">
+        <div class="field-group"><label>Titul za jménem <span class="badge-optional">opt.</span></label><input type="text" name="titul_za" placeholder="Ph.D.…"></div>
+        <div class="field-group"><label>Národnost <span class="req">*</span></label><input type="text" name="narodnost" required placeholder="Česká"></div>
+      </div>
+      <div class="field-grid col2">
+        <div class="field-group"><label>Datum narození <span class="req">*</span></label><input type="date" name="datum_narozeni" required></div>
+        <div class="field-group"><label>Rodné číslo <span class="req">*</span></label><input type="text" name="rodne_cislo" required placeholder="9001011234"></div>
+      </div>
+      <div class="nav-row">
+        <span></span>
+        <button type="button" class="btn btn-primary" onclick="nextStep(1)">Pokračovat →</button>
+      </div>
+    </div>
+
+    <!-- KROK 2: DOKLADY -->
+    <div class="form-card" data-step="2">
+      <div class="card-header">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+        <div><div class="card-title">Doklady totožnosti</div><div class="card-subtitle">OP je povinný, pas nepovinný</div></div>
+      </div>
+      <div class="field-grid col3">
+        <div class="field-group"><label>Číslo OP <span class="req">*</span></label><input type="text" name="op_cislo" required placeholder="123456789"></div>
+        <div class="field-group"><label>Platnost do <span class="req">*</span></label><input type="date" name="op_platnost" required></div>
+        <div class="field-group"><label>Země vydání OP <span class="req">*</span></label><input type="text" name="op_zeme" required placeholder="Česká republika"></div>
+      </div>
+      <div class="divider">Cestovní pas (nepovinné)</div>
+      <div class="field-grid col3">
+        <div class="field-group"><label>Číslo pasu</label><input type="text" name="pas_cislo" placeholder="AB1234567"></div>
+        <div class="field-group"><label>Platnost do</label><input type="date" name="pas_platnost"></div>
+        <div class="field-group"><label>Země vydání pasu</label><input type="text" name="pas_zeme" placeholder="Česká republika"></div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-ghost" onclick="goTo(1)">← Zpět</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Pokračovat →</button>
+      </div>
+    </div>
+
+    <!-- KROK 3: KONTAKT -->
+    <div class="form-card" data-step="3">
+      <div class="card-header">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div><div class="card-title">Kontakt a cesta</div><div class="card-subtitle">Kontaktní údaje a informace o aktivitách</div></div>
+      </div>
+      <div class="field-grid col2">
+        <div class="field-group"><label>Telefon <span class="req">*</span></label><input type="tel" name="telefon" required placeholder="+420 777 123 456"></div>
+        <div class="field-group"><label>E-mail <span class="req">*</span></label><input type="email" name="email" required placeholder="jana@example.cz"></div>
+      </div>
+      <div class="field-group">
+        <label>Adresa bydliště <span class="req">*</span></label>
+        <input type="text" name="adresa" required placeholder="Václavské náměstí 1, 110 00 Praha 1">
+        <p class="hint">Město, PSČ, ulice a číslo popisné</p>
+      </div>
+      <div class="field-group">
+        <label>Aktivity mobility <span class="badge-optional">opt.</span></label>
+        <textarea name="aktivity" placeholder="Např.: Job-shadowing v Berlíně — červen 2025"></textarea>
+        <p class="hint">Typ aktivity, stát, město, termín</p>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-ghost" onclick="goTo(2)">← Zpět</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(3)">Pokračovat →</button>
+      </div>
+    </div>
+
+    <!-- KROK 4: FINANCE & POJIŠTĚNÍ -->
+    <div class="form-card" data-step="4">
+      <div class="card-header">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div><div class="card-title">Finance a pojištění</div><div class="card-subtitle">Bankovní účet a cestovní pojištění</div></div>
+      </div>
+      <div class="info-box">
+        <span class="info-box-icon">⚠️</span>
+        <span id="pojisteniInfoText"></span>
+      </div>
+      <div class="field-grid col2">
+        <div class="field-group"><label>Poskytovatel pojištění <span class="badge-optional">opt.</span></label><input type="text" name="pojisteni_poskytovatel" placeholder="Např. Allianz"></div>
+        <div class="field-group"><label>Číslo pojištění <span class="badge-optional">opt.</span></label><input type="text" name="pojisteni_cislo" placeholder="POJ-123456"></div>
+      </div>
+      <div class="divider">Bankovní účet</div>
+      <div class="field-grid col2">
+        <div class="field-group"><label>Majitel účtu</label><input type="text" name="banka_majitel"></div>
+        <div class="field-group"><label>Název banky</label><input type="text" name="banka_nazev"></div>
+      </div>
+      <div class="field-grid col2">
+        <div class="field-group"><label>BIC / SWIFT</label><input type="text" name="bic_swift" placeholder="FIOBCZPPXXX"></div>
+        <div class="field-group"><label>Číslo účtu</label><input type="text" name="banka_cislo" placeholder="123456789/0800"></div>
+      </div>
+      <div class="field-group"><label>IBAN</label><input type="text" name="iban" placeholder="CZ65 0800 0000 1920 0014 5399"></div>
+      <div class="field-group">
+        <label>Měna</label>
+        <div class="radio-group">
+          <label class="radio-option"><input type="radio" name="mena" value="CZK" checked> CZK — Česká koruna</label>
+          <label class="radio-option"><input type="radio" name="mena" value="EUR"> EUR — Euro</label>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-ghost" onclick="goTo(3)">← Zpět</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(4)">Pokračovat →</button>
+      </div>
+    </div>
+
+    <!-- KROK 5: PRACOVNÍ ÚDAJE -->
+    <div class="form-card" data-step="5">
+      <div class="card-header">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+        <div><div class="card-title">Pracovní údaje a cíle</div><div class="card-subtitle">Vaše role a cíle v rámci mobility</div></div>
+      </div>
+      <div class="field-group"><label>Vaše pozice ve vysílající organizaci</label><input type="text" name="pozice_v_org" placeholder="Např. dobrovolník, ředitelka…"></div>
+      <div class="field-group"><label>Popis vašich činností na této pozici</label><textarea name="popis_cinnosti"></textarea></div>
+      <div class="field-group"><label>Název úkolu v rámci mobility</label><input type="text" name="nazev_ukolu_mobility" placeholder="Co se chcete naučit — jednou větou"></div>
+      <div class="field-group"><label>Podrobný popis cíle</label><textarea name="popis_ukolu_mobility"></textarea></div>
+      <div class="nav-row">
+        <button type="button" class="btn btn-ghost" onclick="goTo(4)">← Zpět</button>
+        <button type="button" class="btn btn-submit" id="submitBtn" onclick="submitForm()">Odeslat formulář ✓</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // ⬇️ SEM VLOŽ URL SVÉHO NASAZENÉHO APPS SCRIPT
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/TVOJE_ID/exec";
+
+  const STEP_LABELS = ["Osobní údaje","Doklady","Kontakt","Finance","Pracovní cíle"];
+  let currentStep = 0;
+  let verifiedKod  = "";
+
+  // ── OVĚŘENÍ KÓDU ────────────────────────────────────────────
+  async function overitKod() {
+    const input = document.getElementById('kodInput');
+    const btn   = document.getElementById('kodBtn');
+    const err   = document.getElementById('kodError');
+    const kod   = input.value.trim();
+    if (!kod) { showKodError("Zadejte přístupový kód."); return; }
+
+    btn.disabled = true;
+    btn.textContent = "Ověřuji…";
+    err.classList.remove('visible');
+
+    try {
+      const res    = await fetch(APPS_SCRIPT_URL + "?action=verify&kod=" + encodeURIComponent(kod));
+      const result = await res.json();
+
+      if (!result.ok) {
+        showKodError(result.msg);
+        btn.disabled = false;
+        btn.textContent = "Ověřit a pokračovat →";
+        return;
+      }
+
+      verifiedKod = kod;
+
+      // Záhlaví
+      document.getElementById('heroNazev').textContent =
+        result.nazev + (result.cislo ? " · " + result.cislo : "");
+      const meta = [result.mesto, result.zeme_region].filter(Boolean).join(", ");
+      document.getElementById('heroMeta').textContent = meta;
+      document.getElementById('heroProject').classList.add('visible');
+
+      // Pojišťovací info box
+      document.getElementById('pojisteniInfoText').innerHTML = result.pojisteni_organizace
+        ? "<strong>Pojištění nevyplňujte</strong> — bude zajištěno vysílající organizací. Pokud ale chcete využít vlastní pojištění, doplňte jej."
+        : "Účastník mobility si zajistí cestovní pojištění. Vyplňte níže uvedené údaje. Pokud pojištění ještě nemáte zajištěné, nechte pole prázdné a doplňte jej dodatečně.";
+
+      document.getElementById('progressWrap').style.display = 'block';
+      goTo(1);
+
+    } catch (e) {
+      showKodError("Chyba komunikace. Zkuste to prosím znovu.");
+      btn.disabled = false;
+      btn.textContent = "Ověřit a pokračovat →";
+    }
+  }
+
+  function showKodError(msg) {
+    const err = document.getElementById('kodError');
+    err.textContent = msg;
+    err.classList.add('visible');
+  }
+
+  // ── NAVIGACE ────────────────────────────────────────────────
+  function goTo(n) {
+    document.querySelectorAll('.form-card').forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-step="' + n + '"]').classList.add('active');
+    currentStep = n;
+    if (n > 0) buildProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function nextStep(from) {
+    if (!validateStep(from)) {
+      showToast("Prosím vyplňte všechna povinná pole (označena *).", false);
+      return;
+    }
+    goTo(from + 1);
+  }
+
+  function buildProgress() {
+    const row   = document.getElementById('stepsRow');
+    const names = document.getElementById('stepNames');
+    row.innerHTML = ''; names.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'step-dot' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+      if (i < currentStep) dot.onclick = () => goTo(i);
+      row.appendChild(dot);
+      const nm = document.createElement('div');
+      nm.className = 'step-name' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+      nm.textContent = STEP_LABELS[i - 1];
+      if (i < currentStep) nm.onclick = () => goTo(i);
+      names.appendChild(nm);
+    }
+    document.getElementById('progCount').textContent = 'Krok ' + currentStep + ' / 5';
+  }
+
+  function validateStep(n) {
+    const card = document.querySelector('[data-step="' + n + '"]');
+    let ok = true;
+    card.querySelectorAll('[required]').forEach(el => {
+      el.classList.remove('invalid');
+      if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
+    });
+    return ok;
+  }
+
+  // ── ODESLÁNÍ ────────────────────────────────────────────────
+  async function submitForm() {
+    if (!validateStep(5)) { showToast("Prosím zkontrolujte povinná pole.", false); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = "Odesílání…";
+
+    const formData = { erasmus_form: '1', kod: verifiedKod };
+    new FormData(document.getElementById('mainForm')).forEach((v, k) => { formData[k] = v; });
+
+    try {
+      const res    = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(formData) });
+      const result = await res.json();
+
+      if (result.status === 'ok') {
+        showToast("✓ " + result.message, true);
+        btn.textContent = "Odesláno ✓";
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (e) {
+      showToast("Chyba: " + e.message, false);
+      btn.disabled = false;
+      btn.textContent = "Odeslat formulář ✓";
+    }
+  }
+
+  function showToast(msg, ok) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.borderColor = ok ? 'var(--success)' : 'var(--error)';
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 6000);
+  }
+
+  document.getElementById('kodInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); overitKod(); }
+  });
+</script>
+</body>
+</html>
