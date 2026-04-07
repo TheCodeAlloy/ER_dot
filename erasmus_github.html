@@ -100,6 +100,13 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 .code-center .card-subtitle{margin-bottom:1.75rem;}
 .code-input-wrap{width:100%;max-width:320px;}
 .code-input-wrap input{text-align:center;font-size:1.1rem;letter-spacing:2px;font-weight:500;}
+/* TOOLTIP */
+.tip-wrap{position:relative;display:inline-flex;align-items:center;margin-left:6px;vertical-align:middle;}
+.tip-icon{width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;font-size:10px;font-weight:700;font-style:normal;display:inline-flex;align-items:center;justify-content:center;cursor:default;line-height:1;flex-shrink:0;}
+.tip-box{display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);background:var(--navy);color:#fff;font-size:.78rem;line-height:1.55;padding:.65rem .85rem;border-radius:10px;width:260px;z-index:100;font-weight:400;box-shadow:0 4px 16px rgba(10,22,40,.25);}
+.tip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
+.tip-wrap:hover .tip-box,.tip-wrap:focus-within .tip-box{display:block;}
+@media(max-width:480px){.tip-box{width:200px;left:0;transform:none;}}
 </style>
 </head>
 <body>
@@ -249,7 +256,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
       </div>
       <div class="field-group">
         <label>Adresa bydliště <span class="req">*</span></label>
-        <input type="text" name="adresa" required placeholder="Václavské náměstí 1, 110 00 Praha 1">
+        <input type="text" name="adresa" required>
         <p class="hint">Město, PSČ, ulice a číslo popisné</p>
       </div>
       <div class="nav-row">
@@ -269,8 +276,8 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
         <span id="pojisteniInfoText"></span>
       </div>
       <div class="field-grid col2">
-        <div class="field-group"><label>Poskytovatel pojištění <span class="badge-optional">opt.</span></label><input type="text" name="pojisteni_poskytovatel" placeholder="Např. Allianz"></div>
-        <div class="field-group"><label>Číslo pojištění <span class="badge-optional">opt.</span></label><input type="text" name="pojisteni_cislo" placeholder="POJ-123456"></div>
+        <div class="field-group"><label>Poskytovatel pojištění <span class="badge-optional">opt.</span></label><input type="text" name="pojisteni_poskytovatel"></div>
+        <div class="field-group"><label>Číslo pojištění <span class="badge-optional">opt.</span></label><input type="text" name="pojisteni_cislo"></div>
       </div>
       <div class="divider">Bankovní účet</div>
       <div class="info-box">
@@ -282,10 +289,10 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
         <div class="field-group"><label>Název banky</label><input type="text" name="banka_nazev"></div>
       </div>
       <div class="field-grid col2">
-        <div class="field-group"><label>BIC / SWIFT</label><input type="text" name="bic_swift" placeholder="FIOBCZPPXXX"></div>
-        <div class="field-group"><label>Číslo účtu</label><input type="text" name="banka_cislo" placeholder="123456789/0800"></div>
+        <div class="field-group"><label>BIC / SWIFT</label><input type="text" name="bic_swift"></div>
+        <div class="field-group"><label>Číslo účtu</label><input type="text" name="banka_cislo"><p class="hint">Formát: 123456789/0800</p></div>
       </div>
-      <div class="field-group"><label>IBAN</label><input type="text" name="iban" placeholder="CZ65 0800 0000 1920 0014 5399"></div>
+      <div class="field-group"><label>IBAN</label><input type="text" name="iban"></div>
       <div class="field-group">
         <label>Měna</label>
         <div class="radio-group">
@@ -309,10 +316,25 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
         <span class="info-box-icon">📋</span>
         <span>Pokud některou informaci v tuto chvíli ještě neznáte, můžete pole nechat prázdné. <strong>Tato data jsou však nezbytná pro vygenerování smluvní dokumentace</strong> a musí být doplněna v dostatečném předstihu před zahájením mobility.</span>
       </div>
-      <div class="field-group"><label>Vaše pozice ve vysílající organizaci</label><input type="text" name="pozice_v_org" placeholder="Např. dobrovolník, ředitelka…"></div>
-      <div class="field-group"><label>Popis vašich činností na této pozici</label><textarea name="popis_cinnosti"></textarea></div>
-      <div class="field-group"><label>Název úkolu v rámci mobility</label><input type="text" name="nazev_ukolu_mobility" placeholder="Co se chcete naučit — jednou větou"></div>
-      <div class="field-group"><label>Podrobný popis cíle</label><textarea name="popis_ukolu_mobility"></textarea></div>
+      <div class="field-group"><label>Vaše pozice ve vysílající organizaci</label><input type="text" name="pozice_v_org"></div>
+      <div class="field-group">
+        <label>Popis vašich činností na této pozici
+          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</span></span>
+        </label>
+        <textarea name="popis_cinnosti"></textarea>
+      </div>
+      <div class="field-group">
+        <label>Název úkolu v rámci mobility
+          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</span></span>
+        </label>
+        <input type="text" name="nazev_ukolu_mobility">
+      </div>
+      <div class="field-group">
+        <label>Podrobný popis cíle
+          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</span></span>
+        </label>
+        <textarea name="popis_ukolu_mobility"></textarea>
+      </div>
       <div class="nav-row">
         <button type="button" class="btn btn-ghost" onclick="goTo(4)">← Zpět</button>
         <button type="button" class="btn btn-submit" id="submitBtn" onclick="submitForm()">Odeslat formulář ✓</button>
@@ -334,7 +356,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ2or0mdhAACixk6DSevhDcCNI6B1VdTyLMWdjc1bFsIWO1xVfFdKzci9EdsNGmKbq/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/TVOJE_ID/exec";
 const STEP_LABELS = ["Osobní údaje","Doklady","Kontakt","Finance","Pracovní cíle"];
 let currentStep = 0, verifiedKod = "";
 
