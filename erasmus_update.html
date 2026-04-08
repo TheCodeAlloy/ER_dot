@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erasmus+ — Doplnění údajů</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0a1628;--blue:#1a4fd6;--gold:#f0b429;
+  --surface:#f0f4ff;--white:#fff;--text:#1a1f36;
+  --muted:#6b7898;--border:#d8e0f5;--error:#dc2626;
+  --success:#059669;--radius:14px;
+  --shadow:0 4px 24px rgba(10,22,40,.10);
+  --shadow-lg:0 8px 48px rgba(10,22,40,.16);
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 10% 0%,rgba(26,79,214,.08) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 40% at 90% 100%,rgba(240,180,41,.07) 0%,transparent 60%);}
+.page-wrap{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:2rem 1rem 4rem;}
+
+/* HERO */
+.hero{background:var(--navy);border-radius:20px;padding:2rem;margin-bottom:2rem;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(26,79,214,.2);}
+.hero::after{content:'';position:absolute;bottom:-50px;left:40px;width:160px;height:160px;border-radius:50%;background:rgba(240,180,41,.10);}
+.hero-top{display:flex;align-items:center;gap:1.25rem;position:relative;z-index:1;}
+.eu-flag{flex-shrink:0;width:60px;height:40px;border-radius:4px;}
+.hero-erasmus{font-size:1.5rem;font-weight:400;color:#fff;line-height:1.1;}
+.hero-erasmus strong{font-weight:700;}
+.hero-sub{font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.3rem;}
+.hero-spolufinancovano{margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.12);position:relative;z-index:1;font-size:.72rem;color:rgba(255,255,255,.45);}
+
+/* CARD */
+.card{background:var(--white);border-radius:20px;padding:2rem;box-shadow:var(--shadow);border:1px solid var(--border);display:none;animation:fadeUp .35s ease;}
+.card.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.card-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
+.card-icon{width:48px;height:48px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.card-icon svg{width:22px;height:22px;fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.card-title{font-size:1.15rem;font-weight:700;color:var(--navy);}
+.card-subtitle{font-size:.82rem;color:var(--muted);margin-top:2px;}
+
+/* MODE SELECTION */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:.5rem;}
+@media(max-width:480px){.mode-grid{grid-template-columns:1fr;}}
+.mode-btn{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:1.25rem 1rem;cursor:pointer;transition:all .2s;text-align:left;}
+.mode-btn:hover{border-color:var(--blue);background:#eef2ff;}
+.mode-btn.selected{border-color:var(--blue);background:#eef2ff;}
+.mode-btn-icon{font-size:1.5rem;margin-bottom:.5rem;}
+.mode-btn-title{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:.25rem;}
+.mode-btn-desc{font-size:.78rem;color:var(--muted);line-height:1.5;}
+
+/* FIELDS */
+.field-group{margin-bottom:1.25rem;}
+label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;}
+label .req{color:var(--blue);margin-left:2px;}
+input[type=text],input[type=email],textarea{
+  width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;
+  padding:.65rem .9rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;color:var(--text);
+  transition:border-color .2s,box-shadow .2s,background .2s;outline:none;
+}
+input:focus,textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,79,214,.1);}
+input.invalid,textarea.invalid{border-color:var(--error);background:#fff5f5;}
+textarea{resize:vertical;min-height:90px;line-height:1.6;}
+
+/* READONLY FIELD */
+.field-readonly{background:#f7f9ff;border:1.5px solid var(--border);border-radius:10px;padding:.65rem .9rem;font-size:.9rem;color:var(--text);line-height:1.5;display:flex;align-items:flex-start;gap:.6rem;}
+.field-readonly-val{flex:1;}
+.field-readonly-lock{font-size:12px;color:var(--muted);flex-shrink:0;margin-top:2px;}
+.field-readonly-empty{color:var(--muted);font-style:italic;}
+
+/* OTP */
+.otp-row{display:flex;gap:8px;justify-content:center;margin-bottom:1.25rem;}
+.otp-row input{width:48px;height:58px;font-size:1.6rem;font-weight:700;text-align:center;border:2px solid var(--border);border-radius:10px;color:var(--navy);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.otp-row input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,79,214,.12);background:#fff;}
+.otp-row input.filled{border-color:var(--blue);background:#eef2ff;}
+.otp-row input.otp-error{border-color:var(--error);background:#fff5f5;}
+@media(max-width:380px){.otp-row input{width:40px;height:50px;font-size:1.3rem;}}
+
+/* INFO BOX */
+.info-box{border:1.5px solid #fcd34d;border-radius:10px;padding:.75rem 1rem;font-size:.82rem;color:#78450a;line-height:1.6;margin-bottom:1.25rem;display:flex;gap:.6rem;background:#fffbea;}
+.info-box-icon{font-size:14px;flex-shrink:0;margin-top:2px;}
+
+/* TOOLTIP */
+.tip-wrap{position:relative;display:inline-flex;align-items:center;margin-left:6px;vertical-align:middle;}
+.tip-icon{width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;font-size:10px;font-weight:700;font-style:normal;display:inline-flex;align-items:center;justify-content:center;cursor:default;line-height:1;flex-shrink:0;}
+.tip-box{display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);background:var(--navy);color:#fff;font-size:.78rem;line-height:1.55;padding:.65rem .85rem;border-radius:10px;width:320px;z-index:100;font-weight:400;box-shadow:0 4px 16px rgba(10,22,40,.25);white-space:pre-line;}
+.tip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
+.tip-wrap:hover .tip-box,.tip-wrap:focus-within .tip-box{display:block;}
+@media(max-width:480px){.tip-box{width:200px;left:0;transform:none;}}
+
+/* BUTTONS */
+.btn{font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.5px;border:none;border-radius:10px;padding:.75rem 1.5rem;cursor:pointer;transition:all .2s;text-transform:uppercase;width:100%;margin-top:.5rem;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover:not(:disabled){background:#1340b8;transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,79,214,.3);}
+.btn-primary:disabled{opacity:.6;pointer-events:none;}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);margin-top:.75rem;}
+.btn-ghost:hover{border-color:#b0bcd8;color:var(--text);}
+.btn-submit{background:var(--navy);color:#fff;}
+.btn-submit:hover:not(:disabled){background:#0f2040;transform:translateY(-1px);box-shadow:0 6px 20px rgba(10,22,40,.3);}
+.btn-submit:disabled{opacity:.6;pointer-events:none;}
+
+/* ERROR */
+.error-msg{background:#fff5f5;border:1.5px solid var(--error);border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:var(--error);margin-top:.75rem;display:none;line-height:1.5;}
+.error-msg.visible{display:block;}
+
+/* COUNTDOWN */
+.countdown{font-size:.8rem;color:var(--muted);text-align:center;margin-top:.5rem;min-height:20px;}
+
+/* THANK YOU */
+.thankyou-page{display:none;min-height:100vh;align-items:center;justify-content:center;padding:2rem 1rem;}
+.thankyou-page.visible{display:flex;}
+.thankyou-card{background:#fff;border-radius:24px;padding:3rem 2rem;box-shadow:var(--shadow-lg);border:1px solid var(--border);text-align:center;max-width:480px;width:100%;animation:fadeUp .5s ease;}
+.thankyou-icon{width:80px;height:80px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;}
+.thankyou-icon svg{width:40px;height:40px;stroke:var(--success);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.thankyou-title{font-size:1.5rem;font-weight:800;color:var(--navy);margin-bottom:.75rem;}
+.thankyou-text{color:var(--muted);font-size:.95rem;line-height:1.7;}
+.thankyou-sub{color:#b0bcd8;font-size:.82rem;margin-top:1.5rem;}
+
+.divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="eu-flag" viewBox="0 0 72 48" xmlns="http://www.w3.org/2000/svg">
+        <rect width="72" height="48" fill="#003399"/>
+        <g fill="#FFCC00">
+          <polygon transform="translate(36,10)"   points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(43,11.9)" points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(48.1,17)"  points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(50,24)"   points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(48.1,31)"  points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(43,36.1)" points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(36,38)"   points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(29,36.1)" points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(23.9,31)"  points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(22,24)"   points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(23.9,17)"  points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+          <polygon transform="translate(29,11.9)" points="0,-2.5 0.59,-0.81 2.38,-0.77 0.95,0.31 1.47,2.02 0,1.05 -1.47,2.02 -0.95,0.31 -2.38,-0.77 -0.59,-0.81"/>
+        </g>
+      </svg>
+      <div>
+        <div class="hero-erasmus">Erasmus<strong>+</strong></div>
+        <div class="hero-sub">Doplnění údajů</div>
+      </div>
+    </div>
+    <div class="hero-spolufinancovano">Spolufinancováno Evropskou unií</div>
+  </header>
+
+  <!-- KROK 0: VÝBĚR TYPU -->
+  <div class="card active" id="card-mode">
+    <div class="card-header">
+      <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      <div><div class="card-title">Co chcete doplnit?</div><div class="card-subtitle">Vyberte typ údajů</div></div>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-btn" id="btn-mode-pojisteni" onclick="selectMode('pojisteni')">
+        <div class="mode-btn-icon">🛡️</div>
+        <div class="mode-btn-title">Cestovní pojištění</div>
+        <div class="mode-btn-desc">Doplnit poskytovatele a číslo pojistky</div>
+      </div>
+      <div class="mode-btn" id="btn-mode-prace" onclick="selectMode('prace')">
+        <div class="mode-btn-icon">💼</div>
+        <div class="mode-btn-title">Pracovní údaje a cíle</div>
+        <div class="mode-btn-desc">Doplnit pozici, popis činností a cíle mobility</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KROK 1: KÓD + EMAIL -->
+  <div class="card" id="card-auth">
+    <div class="card-header">
+      <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div><div class="card-title">Ověření totožnosti</div><div class="card-subtitle" id="auth-subtitle">Zadejte přístupový kód a e-mail</div></div>
+    </div>
+    <div class="field-group">
+      <label>Přístupový kód <span class="req">*</span></label>
+      <input type="text" id="auth-kod" placeholder="" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <label>E-mailová adresa <span class="req">*</span></label>
+      <input type="email" id="auth-email" placeholder="">
+      <div class="error-msg" id="auth-error"></div>
+    </div>
+    <button class="btn btn-primary" id="auth-btn" onclick="sendOTP()">Odeslat ověřovací kód →</button>
+    <button class="btn btn-ghost" onclick="goTo('card-mode')">← Zpět</button>
+  </div>
+
+  <!-- KROK 2: OTP -->
+  <div class="card" id="card-otp">
+    <div class="card-header">
+      <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+      <div><div class="card-title">Zadejte kód</div><div class="card-subtitle" id="otp-subtitle">Kód byl odeslán na váš e-mail</div></div>
+    </div>
+    <div class="otp-row" id="otp-row">
+      <input type="text" inputmode="numeric" maxlength="1" data-idx="0" autocomplete="one-time-code">
+      <input type="text" inputmode="numeric" maxlength="1" data-idx="1">
+      <input type="text" inputmode="numeric" maxlength="1" data-idx="2">
+      <input type="text" inputmode="numeric" maxlength="1" data-idx="3">
+      <input type="text" inputmode="numeric" maxlength="1" data-idx="4">
+      <input type="text" inputmode="numeric" maxlength="1" data-idx="5">
+    </div>
+    <div class="error-msg" id="otp-error"></div>
+    <button class="btn btn-primary" id="otp-btn" onclick="verifyOTP()" disabled>Ověřit kód</button>
+    <div class="divider">nebo</div>
+    <button class="btn btn-ghost" id="resend-btn" onclick="resendOTP()">Zaslat nový kód</button>
+    <p class="countdown" id="countdown"></p>
+  </div>
+
+  <!-- KROK 3A: POJIŠTĚNÍ -->
+  <div class="card" id="card-pojisteni">
+    <div class="card-header">
+      <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div><div class="card-title">Cestovní pojištění</div><div class="card-subtitle">Doplňte údaje o pojistce</div></div>
+    </div>
+    <div class="info-box">
+      <span class="info-box-icon">ℹ️</span>
+      <span id="pojisteni-info-text">Doplňte údaje o cestovním pojištění.</span>
+    </div>
+    <div class="field-group">
+      <label>Poskytovatel pojištění</label>
+      <input type="text" id="upd-pojisteni-poskytovatel">
+    </div>
+    <div class="field-group">
+      <label>Číslo pojištění</label>
+      <input type="text" id="upd-pojisteni-cislo">
+    </div>
+    <div class="error-msg" id="pojisteni-error"></div>
+    <button class="btn btn-submit" id="pojisteni-btn" onclick="submitUpdate('pojisteni')">Uložit údaje ✓</button>
+    <button class="btn btn-ghost" onclick="goTo('card-mode')">← Začít znovu</button>
+  </div>
+
+  <!-- KROK 3B: PRACOVNÍ ÚDAJE -->
+  <div class="card" id="card-prace">
+    <div class="card-header">
+      <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+      <div><div class="card-title">Pracovní údaje a cíle</div><div class="card-subtitle">Doplňte nebo aktualizujte</div></div>
+    </div>
+    <div class="info-box">
+      <span class="info-box-icon">📋</span>
+      <span>Pole označená 🔒 již byla vyplněna — nelze je měnit. Prázdná pole doplňte a uložte.</span>
+    </div>
+
+    <div class="field-group" id="fg-pozice">
+      <label>Vaše pozice ve vysílající organizaci
+        <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box" data-tip="pozice"></span></span>
+      </label>
+      <div id="disp-pozice"></div>
+    </div>
+    <div class="field-group" id="fg-cinnosti">
+      <label>Popis vašich činností na této pozici
+        <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box" data-tip="cinnosti"></span></span>
+      </label>
+      <div id="disp-cinnosti"></div>
+    </div>
+    <div class="field-group" id="fg-ukol">
+      <label>Název úkolu/cíle v rámci mobility
+        <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box" data-tip="ukol"></span></span>
+      </label>
+      <div id="disp-ukol"></div>
+    </div>
+    <div class="field-group" id="fg-popis">
+      <label>Podrobný popis vašeho úkolu/cíle
+        <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box" data-tip="popis"></span></span>
+      </label>
+      <div id="disp-popis"></div>
+    </div>
+
+    <div class="error-msg" id="prace-error"></div>
+    <button class="btn btn-submit" id="prace-btn" onclick="submitUpdate('prace')">Uložit údaje ✓</button>
+    <button class="btn btn-ghost" onclick="goTo('card-mode')">← Začít znovu</button>
+  </div>
+
+</div>
+
+<div class="thankyou-page" id="thankyouPage">
+  <div class="thankyou-card">
+    <div class="thankyou-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="thankyou-title">Údaje uloženy</div>
+    <p class="thankyou-text">Vaše údaje byly úspěšně doplněny.<br>Děkujeme!</p>
+    <p class="thankyou-sub">Toto okno můžete zavřít.</p>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ2or0mdhAACixk6DSevhDcCNI6B1VdTyLMWdjc1bFsIWO1xVfFdKzci9EdsNGmKbq/exec";
+
+let selectedMode = '';
+let sessionId    = '';
+let resendCooldown = 0;
+let cooldownTimer  = null;
+let existingData   = {};
+
+// ── Navigace ─────────────────────────────────────────────────
+function goTo(cardId) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  document.getElementById(cardId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Výběr módu ───────────────────────────────────────────────
+function selectMode(mode) {
+  selectedMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('btn-mode-' + mode).classList.add('selected');
+  document.getElementById('auth-subtitle').textContent =
+    mode === 'pojisteni' ? 'Doplnění cestovního pojištění' : 'Doplnění pracovních údajů';
+  goTo('card-auth');
+}
+
+// ── Odeslání OTP ─────────────────────────────────────────────
+async function sendOTP() {
+  const kod   = document.getElementById('auth-kod').value.trim();
+  const email = document.getElementById('auth-email').value.trim();
+  const err   = document.getElementById('auth-error');
+  const btn   = document.getElementById('auth-btn');
+
+  err.classList.remove('visible');
+  if (!kod || !email) { showError(err, "Vyplňte přístupový kód i e-mailovou adresu."); return; }
+
+  btn.disabled = true; btn.textContent = "Odesílám…";
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + "?action=erasmus_send_otp&kod=" +
+      encodeURIComponent(kod) + "&email=" + encodeURIComponent(email) +
+      "&mode=" + encodeURIComponent(selectedMode));
+    const result = await res.json();
+
+    if (!result.ok) { showError(err, result.msg); btn.disabled = false; btn.textContent = "Odeslat ověřovací kód →"; return; }
+
+    sessionId = result.sessionId;
+    document.getElementById('otp-subtitle').textContent = "Kód jsme odeslali na " + result.maskedEmail + ". Platí 15 minut.";
+    setupOTPInputs();
+    goTo('card-otp');
+    startCooldown(60);
+    setTimeout(() => document.querySelector('.otp-row input').focus(), 150);
+
+  } catch(e) {
+    showError(err, "Chyba komunikace. Zkuste to prosím znovu.");
+    btn.disabled = false; btn.textContent = "Odeslat ověřovací kód →";
+  }
+}
+
+async function resendOTP() {
+  if (resendCooldown > 0) return;
+  document.getElementById('auth-btn').disabled = false;
+  document.getElementById('auth-btn').textContent = "Odeslat ověřovací kód →";
+  goTo('card-auth');
+  await sendOTP();
+}
+
+// ── OTP logika ───────────────────────────────────────────────
+function setupOTPInputs() {
+  const inputs = document.querySelectorAll('.otp-row input');
+  inputs.forEach(inp => {
+    inp.value = '';
+    inp.classList.remove('filled', 'otp-error');
+    inp.replaceWith(inp.cloneNode(true)); // reset listeners
+  });
+  document.querySelectorAll('.otp-row input').forEach((inp, idx) => {
+    inp.addEventListener('input', e => {
+      const v = e.target.value.replace(/\D/g,'');
+      inp.value = v ? v[v.length-1] : '';
+      inp.classList.toggle('filled', !!inp.value);
+      if (inp.value && idx < 5) document.querySelectorAll('.otp-row input')[idx+1].focus();
+      document.getElementById('otp-btn').disabled = getOTP().length !== 6;
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key==='Backspace' && !inp.value && idx > 0) {
+        const prev = document.querySelectorAll('.otp-row input')[idx-1];
+        prev.focus(); prev.value=''; prev.classList.remove('filled');
+        document.getElementById('otp-btn').disabled = true;
+      }
+    });
+    inp.addEventListener('paste', e => {
+      e.preventDefault();
+      const p = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').substring(0,6);
+      const all = document.querySelectorAll('.otp-row input');
+      p.split('').forEach((ch,i) => { if(all[i]){all[i].value=ch;all[i].classList.add('filled');} });
+      all[Math.min(p.length,5)].focus();
+      document.getElementById('otp-btn').disabled = getOTP().length !== 6;
+    });
+  });
+}
+
+function getOTP() { return [...document.querySelectorAll('.otp-row input')].map(i=>i.value).join(''); }
+
+async function verifyOTP() {
+  const otp = getOTP();
+  if (otp.length !== 6) return;
+  const btn = document.getElementById('otp-btn');
+  const err = document.getElementById('otp-error');
+  err.classList.remove('visible');
+  btn.disabled = true; btn.textContent = "Ověřuji…";
+
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + "?action=erasmus_verify_otp&sessionId=" +
+      encodeURIComponent(sessionId) + "&otp=" + encodeURIComponent(otp));
+    const result = await res.json();
+
+    if (!result.ok) {
+      showError(err, result.msg);
+      document.querySelectorAll('.otp-row input').forEach(i => { i.value=''; i.classList.remove('filled'); i.classList.add('otp-error'); });
+      setTimeout(() => document.querySelectorAll('.otp-row input').forEach(i => i.classList.remove('otp-error')), 1000);
+      document.querySelectorAll('.otp-row input')[0].focus();
+      btn.disabled = true; btn.textContent = "Ověřit kód";
+      return;
+    }
+
+    // Úspěch
+    if (result.mode === 'pojisteni') {
+      goTo('card-pojisteni');
+    } else {
+      existingData = result.existing || {};
+      if (result.tips) {
+        Object.entries(result.tips).forEach(([k,v]) => {
+          const el = document.querySelector('[data-tip="'+k+'"]');
+          if (el && v) el.textContent = v;
+        });
+      }
+      renderPraceFields();
+      goTo('card-prace');
+    }
+
+  } catch(e) {
+    showError(err, "Chyba komunikace. Zkuste to znovu.");
+    btn.disabled = false; btn.textContent = "Ověřit kód";
+  }
+}
+
+// ── Render pracovních polí ────────────────────────────────────
+function renderPraceFields() {
+  const fields = [
+    { id: 'pozice',  dataKey: 'pozice_v_org',          inputId: 'upd-pozice',  isTextarea: false },
+    { id: 'cinnosti',dataKey: 'popis_cinnosti',         inputId: 'upd-cinnosti',isTextarea: true  },
+    { id: 'ukol',    dataKey: 'nazev_ukolu_mobility',   inputId: 'upd-ukol',    isTextarea: false },
+    { id: 'popis',   dataKey: 'popis_ukolu_mobility',   inputId: 'upd-popis',   isTextarea: true  }
+  ];
+
+  fields.forEach(f => {
+    const container = document.getElementById('disp-' + f.id);
+    const val = existingData[f.dataKey] || '';
+    if (val) {
+      container.innerHTML = '<div class="field-readonly"><span class="field-readonly-lock">🔒</span><span class="field-readonly-val">' + escHtml(val) + '</span></div>';
+    } else {
+      if (f.isTextarea) {
+        container.innerHTML = '<textarea id="' + f.inputId + '"></textarea>';
+      } else {
+        container.innerHTML = '<input type="text" id="' + f.inputId + '">';
+      }
+    }
+  });
+}
+
+// ── Odeslání dat ─────────────────────────────────────────────
+async function submitUpdate(mode) {
+  const errEl = document.getElementById(mode + '-error');
+  errEl.classList.remove('visible');
+
+  const payload = { erasmus_update: '1', sessionId };
+
+  if (mode === 'pojisteni') {
+    payload.pojisteni_poskytovatel = document.getElementById('upd-pojisteni-poskytovatel').value.trim();
+    payload.pojisteni_cislo        = document.getElementById('upd-pojisteni-cislo').value.trim();
+    if (!payload.pojisteni_poskytovatel && !payload.pojisteni_cislo) {
+      showError(errEl, "Vyplňte alespoň jedno pole."); return;
+    }
+  } else {
+    const fields = [
+      { dataKey: 'pozice_v_org',         inputId: 'upd-pozice'   },
+      { dataKey: 'popis_cinnosti',        inputId: 'upd-cinnosti' },
+      { dataKey: 'nazev_ukolu_mobility',  inputId: 'upd-ukol'     },
+      { dataKey: 'popis_ukolu_mobility',  inputId: 'upd-popis'    }
+    ];
+    fields.forEach(f => {
+      if (existingData[f.dataKey]) {
+        payload[f.dataKey] = existingData[f.dataKey]; // zachovat existující
+      } else {
+        const el = document.getElementById(f.inputId);
+        payload[f.dataKey] = el ? el.value.trim() : '';
+      }
+    });
+  }
+
+  const btn = document.getElementById(mode + '-btn');
+  btn.disabled = true; btn.textContent = "Ukládám…";
+
+  try {
+    const res    = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const result = await res.json();
+    if (result.status === 'ok') {
+      document.querySelector('.page-wrap').style.display = 'none';
+      document.getElementById('thankyouPage').classList.add('visible');
+    } else {
+      showError(errEl, result.message || "Nastala chyba. Zkuste to znovu.");
+      btn.disabled = false; btn.textContent = "Uložit údaje ✓";
+    }
+  } catch(e) {
+    showError(errEl, "Chyba komunikace: " + e.message);
+    btn.disabled = false; btn.textContent = "Uložit údaje ✓";
+  }
+}
+
+// ── Helpers ──────────────────────────────────────────────────
+function showError(el, msg) { el.textContent = msg; el.classList.add('visible'); }
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+
+function startCooldown(sec) {
+  resendCooldown = sec;
+  const btn = document.getElementById('resend-btn');
+  const cd  = document.getElementById('countdown');
+  btn.disabled = true;
+  clearInterval(cooldownTimer);
+  cooldownTimer = setInterval(() => {
+    resendCooldown--;
+    cd.textContent = resendCooldown > 0 ? 'Nový kód lze zaslat za ' + resendCooldown + ' s' : '';
+    if (resendCooldown <= 0) { clearInterval(cooldownTimer); btn.disabled = false; }
+  }, 1000);
+}
+</script>
+</body>
+</html>
