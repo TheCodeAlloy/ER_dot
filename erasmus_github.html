@@ -103,7 +103,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 /* TOOLTIP */
 .tip-wrap{position:relative;display:inline-flex;align-items:center;margin-left:6px;vertical-align:middle;}
 .tip-icon{width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;font-size:10px;font-weight:700;font-style:normal;display:inline-flex;align-items:center;justify-content:center;cursor:default;line-height:1;flex-shrink:0;}
-.tip-box{display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);background:var(--navy);color:#fff;font-size:.78rem;line-height:1.55;padding:.65rem .85rem;border-radius:10px;width:320px;z-index:100;font-weight:400;box-shadow:0 4px 16px rgba(10,22,40,.25);}
+.tip-box{display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);background:var(--navy);color:#fff;font-size:.78rem;line-height:1.55;padding:.65rem .85rem;border-radius:10px;width:320px;z-index:100;font-weight:400;box-shadow:0 4px 16px rgba(10,22,40,.25);white-space:pre-line;}
 .tip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
 .tip-wrap:hover .tip-box,.tip-wrap:focus-within .tip-box{display:block;}
 @media(max-width:480px){.tip-box{width:200px;left:0;transform:none;}}
@@ -314,24 +314,29 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
       </div>
       <div class="info-box">
         <span class="info-box-icon">📋</span>
-        <span>Pokud některou informaci v tuto chvíli ještě neznáte, můžete pole nechat prázdné. <strong>Tato data jsou však nezbytná pro vygenerování smluvní dokumentace</strong> a musí být doplněna v dostatečném předstihu před zahájením mobility.</span>
+        <span>Vyplňte pole uvedená níže — informace, které zde uvedete, budou obsaženy ve smluvní dokumentaci. Můžete se inspirovat příklady, které se zobrazí po najetí myší na <strong>i</strong> — texty slouží pouze pro inspiraci, neopisujte je doslovně. Pokud si nejste jisti a potřebujete více času, můžete formulář odeslat bez těchto údajů a doplnit je později — avšak v dostatečném předstihu, aby bylo možné zpracovat smluvní dokumentaci před zahájením mobility.</span>
       </div>
-      <div class="field-group"><label>Vaše pozice ve vysílající organizaci</label><input type="text" name="pozice_v_org"></div>
+      <div class="field-group">
+        <label>Vaše pozice ve vysílající organizaci
+          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box" data-tip="pozice"></span></span>
+        </label>
+        <input type="text" name="pozice_v_org">
+      </div>
       <div class="field-group">
         <label>Popis vašich činností na této pozici
-          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</span></span>
+          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box" data-tip="cinnosti"></span></span>
         </label>
         <textarea name="popis_cinnosti"></textarea>
       </div>
-<div class="field-group">
-        <label>Název úkolu v rámci mobility
-          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box">Formulujte stručně a konkrétně — jednou větou. Můžete se inspirovat těmito příklady:<br><br>• Analyzovat obnovitelné zdroje a komunitní energetiku ve Španělsku<br>• Navrhnout řešení pro energetickou soběstačnost obce<br>• Prozkoumat využití alternativních zdrojů v komunitní energetice<br>• Aplikovat alternativní zdroje energie v provozu malých farem<br>• Zpracovat podklady pro integraci projektu do intranetu a úložiště<br>• Vyhodnotit potenciál obnovitelných zdrojů pro komunitní energetiku<br>• Prověřit možnosti využití alternativních zdrojů v regionu MAS Zálabí<br>• Implementovat dobrou praxi z oblasti energetiky do činnosti MAS</span></span>
+      <div class="field-group">
+        <label>Název úkolu/cíle v rámci mobility
+          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box" data-tip="ukol"></span></span>
         </label>
         <input type="text" name="nazev_ukolu_mobility">
       </div>
       <div class="field-group">
-        <label>Podrobný popis cíle
-          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</span></span>
+        <label>Podrobný popis vašeho úkolu/cíle
+          <span class="tip-wrap"><i class="tip-icon">i</i><span class="tip-box" data-tip="popis"></span></span>
         </label>
         <textarea name="popis_ukolu_mobility"></textarea>
       </div>
@@ -356,7 +361,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ2or0mdhAACixk6DSevhDcCNI6B1VdTyLMWdjc1bFsIWO1xVfFdKzci9EdsNGmKbq/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/TVOJE_ID/exec";
 const STEP_LABELS = ["Osobní údaje","Doklady","Kontakt","Finance","Pracovní cíle"];
 let currentStep = 0, verifiedKod = "";
 
@@ -406,6 +411,14 @@ async function overitKod() {
     document.getElementById('pojisteniInfoText').innerHTML = result.pojisteni_organizace
       ? "<strong>Pojištění nevyplňujte</strong> — bude zajištěno vysílající organizací. Pokud ale chcete využít vlastní pojištění, doplňte jej."
       : "Účastník mobility si zajistí cestovní pojištění. Vyplňte níže uvedené údaje. Pokud pojištění ještě nemáte zajištěné, nechte pole prázdné a doplňte jej dodatečně.";
+    // Dosazení tooltipů z tabulky
+    if (result.tips) {
+      const tipMap = { pozice: 'pozice', cinnosti: 'cinnosti', ukol: 'ukol', popis: 'popis' };
+      for (const [key, val] of Object.entries(result.tips)) {
+        const el = document.querySelector('[data-tip="' + key + '"]');
+        if (el && val) el.textContent = val;
+      }
+    }
     document.getElementById('progressWrap').style.display = 'block';
     goTo(1);
   } catch(e) {
